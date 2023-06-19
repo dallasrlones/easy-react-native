@@ -154,3 +154,19 @@ server.listen(process.env.PORT || 1337, err => {
     console.log(err || 'Server running on port 1337')
 });
 ```
+
+# ELEMENTS
+
+### Submit
+This mofeekee will submit a POST onpress
+```jsx
+<Submit src={} payload={} />
+```
+
+### Btn
+This mofeekee will submit a GET onpress
+```jsx
+<Btn src={} />
+```
+
+Currently I'm too lazy to write the props you pass in but src is one of them :p
