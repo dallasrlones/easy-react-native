@@ -1,0 +1,55 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_USER}
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - localnet
+    command: npm run start
+  
+  postgres:
+    image: postgres:9.6.2-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - data:/data/db
+      - ./add_psql_extensions.sh:/docker-entrypoint-initdb.d/add_psql_extensions.sh
+    ports:
+      - "5432:5432"
+    networks:
+      - localnet
+
+  redis:
+    image: redis:alpine
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_USER: ${REDIS_USER}
+    restart: always
+    command: /bin/sh -c "redis-server --requirepass ${REDIS_PASSWORD}"
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    networks:
+      - localnet
+
+volumes:
+  data: {}
+
+networks:
+  localnet:
+    driver: bridge
