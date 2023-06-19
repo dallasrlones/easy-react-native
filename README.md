@@ -1,5 +1,20 @@
 # easy-react-native
-This makes creating apps EASY.
+This makes creating apps EASY. This basically for me to quickly grab off the interwebs so it might have some shidiot things left in there, I will clean it up eventually 😵‍💫
+
+## Starting
+The server is running in docker along with psql so starting that is as easy as get docker and then:
+```terminal
+cd template-server
+docker-compose up --build
+```
+
+The apps are built with Expo so starting the apps is as easy as:
+```terminal
+yarn android
+yarn ios
+```
+
+Press r to reload live with Expo (pretty shmexy)
 
 # Intro
 There are 2 systems, the apps and the API
