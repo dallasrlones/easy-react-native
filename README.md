@@ -10,6 +10,7 @@ docker-compose up --build
 
 The apps are built with Expo so starting the apps is as easy as:
 ```terminal
+cd template-app
 yarn android
 yarn ios
 ```
