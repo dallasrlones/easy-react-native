@@ -26,11 +26,11 @@ The app also has an elements util that replicates HTML elements, and injects awe
 ### Example
 
 ```jsx
-const { useContext, useState, useEffect } = require('react');
-const { AppContext } = require('../../components/State');
+const { useState, useEffect } = require('react');
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+// appState is a global context that you can set it ./components/state.js
 function LoginScreen({ navigation, elements, styles,  appState }) {
     const { setLoggedIn } = appState;
     const { VISIBLE, CENTER, SUBMIT, DIV, SPAN, BR, H1, A, EMAIL, PASSWORD } = elements;
