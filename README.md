@@ -158,16 +158,72 @@ server.listen(process.env.PORT || 1337, err => {
 
 # ELEMENTS
 
-### Submit
-This mofeekee will submit a POST onpress
+### BTN
 ```jsx
-<Submit src={} payload={} />
+//onPress is handled with the success payload from the request
+<BTN style, onPress, src, onError, headers>
+    Click Here
+</BTN>
 ```
 
-### Btn
-This mofeekee will submit a GET onpress
+### SUBMIT
 ```jsx
-<Btn src={} />
+<SUBMIT style, onPress, src, headers, onError, payload>
+    Submit Form
+</SUBMIT>
 ```
 
-Currently I'm too lazy to write the props you pass in but src is one of them :p
+### VISBLE
+
+### DIV
+```jsx
+// ! both, children must be text or components
+<DIV>Text</DIV>
+<DIV><OrComponents /></DIV>
+```
+
+### SPAN
+
+### CENTER
+
+### BR
+
+### HR
+
+### H1
+
+### H2
+
+### H3
+
+### H4
+
+### H5
+
+### H6
+
+### P
+
+### A
+
+### UL
+
+### OL
+
+### LI
+
+### CHECKBOX
+
+### RADIO
+
+### OPTIONS
+
+### SELECT
+
+### HSPLIT
+
+### ICON
+
+### EMAIL
+
+### PASSWORD
