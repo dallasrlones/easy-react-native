@@ -71,7 +71,7 @@ let screens = [];
 
 // EXAMPLE SCREEN
 const DeleteMeProfilePage = ({ elements, appState, httpUtil }) => {
-  const { DIV, H1, CENTER } = elements;
+  const { DIV, H1, CENTER, A } = elements;
   const [userInfo, setUserInfo] = useState({});
 
   useEffect(() => {
@@ -89,6 +89,7 @@ const DeleteMeProfilePage = ({ elements, appState, httpUtil }) => {
       <H1>Profile Page</H1>
       <DIV>{appState.currentTask}</DIV>
       <DIV>{JSON.stringify(userInfo)}</DIV>
+      <A screen="Home">Go Home</A>
     </CENTER>
   )
 };
