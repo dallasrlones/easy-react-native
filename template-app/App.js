@@ -1,16 +1,25 @@
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
-import { useEffect, useState, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import OrientationListeners from './components/OrientationListeners';
 import AuthNavigation from './components/AuthNavigation';
-import { PrimaryScreenHeader } from './components/ScreenHeaders';
-import { AppContextProvider, AppContext } from './components/State';
+import { AppContextProvider } from './components/State';
 
 import HomeScreen from './screens/protected/HomeScreen';
+import { PrimaryScreenHeader } from './components/ScreenHeaders';
+
+import PrimaryNavigationScreen from './screens/protected/navigation_screens/PrimaryNavigation';
 import LogoutScreen from './screens/protected/LogoutScreen';
 
-// these will be injected into each screen as a styles prop so we can have a global color scheme,
-// you can add anything you want to this, even if you want to store static values of non style related things
-// GLOBAL STATE is set in ./components/State.js though, try to use that as its magical
+// This is the async storage location name for your tokens
+// We have to name them differnetly per app because apps share async storage
+const tokenNames = {
+  token: 'RENAME_ME_token',
+  refreshToken: 'RENAME_ME_refreshToken'
+};
+
+// This will be stored in screen props as screen.baseUrl
+// This also sets up httpUtil protected routes to use the baseUrl
+const baseUrl = 'http://localhost:1337';
+
 const styles = {
   colors: {
     dark: '#3d3d3d',
@@ -19,37 +28,73 @@ const styles = {
     danger: '#ff0000',
     success: '#00ff00',
     info: '#0000ff'
+  },
+  menu: {
+    item: {
+      fontSize: 20,
+      color: '#1d1d1d',
+      fontWeight: 'bold',
+    }
   }
 };
 
-// The default unprotected screens are Login, Register, and ForgotPassword
-// Each of which makes a POST to the /login, /register, and /forgotPassword routes respectively
-// You can change those routes in the ./screens/unprotected/*.js files
+let screens = [];
 
-// This is where you set the PROTECTED screens (once the user has logged in)
-const screens = [
-  { name: 'Home', component: HomeScreen, headerComponent: PrimaryScreenHeader },
-  { name: 'Logout', component: LogoutScreen }
-];
+// EXAMPLE SCREEN
+const DeleteMeProfilePage = ({ elements, appState, httpUtil }) => {
+  const { DIV, H1, CENTER } = elements;
+  const [userInfo, setUserInfo] = useState({});
 
-// IMPORTANT
-// CHANGE ./components/State.js TO SET THE BASE URL AND REFRESH ROUTE, currently its set to localhost:3333
+  useEffect(() => {
+    httpUtil.PAYLOAD('GET_USER').then(res => {
+      if (res.success == true) {
+        setUserInfo(res.user);
+      }
+    }).catch(err => {
+      alert(JSON.stringify(err.message));
+    });
+  }, []);
 
-// DEFAULTS ARE: POST| /login { email, password }, /register { email, password }, /refresh { token }
-
-// PROTECTED routes use the headers: { Authorization: `Bearer ${token}` }, the  /login returns a refresh token and a token
-// The token has the expire date and the user id, the refresh token is a random string that is used to get a new token
-  // When the token expires, the app automagically hits up the /refresh route and gets a new token (if everything checks out)
-  // the nodejs server has an expiration date for the refresh tokens, this is so we can auto log people out after X time (15 days)
-  // that time is set in NodeJS using Redis
-
-// So first you log in, get a refresh and token, then you use the token to access protected routes
-
-export default function App() {  
   return (
-    <AppContextProvider>
+    <CENTER type="both" style={{ height: '100%' }}>
+      <H1>Profile Page</H1>
+      <DIV>{appState.currentTask}</DIV>
+      <DIV>{JSON.stringify(userInfo)}</DIV>
+    </CENTER>
+  )
+};
+
+try {
+  screens = [
+    // Main Screen: Your first screen will default to the main screen!
+    { name: 'Home', title: 'Home', component: HomeScreen, headerComponent: PrimaryScreenHeader },
+    { name: 'Logout', title: 'Logout', component: LogoutScreen },
+
+    // screens
+    // EXAMPLE SCREEN
+    { name: 'Profile', title: 'Your Profile', component: DeleteMeProfilePage, headerComponent: PrimaryScreenHeader },
+
+    // navigation
+    { name: 'PrimaryNavigation', component: PrimaryNavigationScreen },
+
+
+  ];
+} catch (err) {
+  alert('Error loading screesn list ' + err.message);
+}
+
+export default function App() {
+  // YOUR state, it will be stored in screen's prop appState
+  // Example Screen: props = { appState } then appState.currentTask or appState.setCurrentTask
+  const [currentTask, setCurrentTask] = useState('I like toitles');
+  const customStateHooks = {
+    currentTask, setCurrentTask
+  };
+
+  return (
+    <AppContextProvider baseUrl={baseUrl} tokenNames={tokenNames} customStateHooks={customStateHooks} >
       <OrientationListeners />
-      <AuthNavigation screens={screens} styles={styles} />
+      <AuthNavigation tokenNames={tokenNames} screens={screens} styles={styles} baseUrl={baseUrl} />
     </AppContextProvider>
   );
 }

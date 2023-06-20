@@ -1,12 +1,11 @@
-import { SafeAreaView, Modal } from 'react-native';
-const { useState } = require("react");
+import { SafeAreaView, Text, Modal, TouchableOpacity } from 'react-native';
+const { useState, useEffect } = require("react");
 
 const PrimaryScreenHeader = ({ screen, styles, elements, navigation }) => {
-    const { DIV, H1, ICON, A } = elements;
-    const [navModalVisible, setNavModalVisible] = useState(false);
+    const { DIV, H1, ICON} = elements;
 
     const navigationMenuClickHandler = () => {
-        setNavModalVisible(true);
+        navigation.navigate('PrimaryNavigation');
     };
 
     return (
@@ -18,12 +17,18 @@ const PrimaryScreenHeader = ({ screen, styles, elements, navigation }) => {
                     <ICON onPress={navigationMenuClickHandler} name="menufold" size={30} color="white" />
                 </DIV>
             </DIV>
-
-            <Modal visible={navModalVisible} animationType="slide">
-                <A navigation={navigation} screen='Logout' onPress={() => { setNavModalVisible(false) }}>Logout</A>
-            </Modal>
         </SafeAreaView>
     );
 };
 
-export { PrimaryScreenHeader };
+const AdminScreeHeader = ({ screen, styles, elements, navigation }) => { };
+
+const AccountingScreenHeader = ({ screen, styles, elements, navigation }) => { };
+
+const InflowOutflowScreenHeader = ({ screen, styles, elements, navigation }) => { };
+
+const BrandsScreenHeader = ({ screen, styles, elements, navigation }) => { };
+
+const SettingsScreenHeader = ({ screen, styles, elements, navigation }) => { };
+
+export { PrimaryScreenHeader, AdminScreeHeader, AccountingScreenHeader, InflowOutflowScreenHeader, BrandsScreenHeader, SettingsScreenHeader };

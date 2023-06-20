@@ -1,15 +1,14 @@
 import { useEffect } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const LogoutScreen = ({ elements, appState }) => {
+const LogoutScreen = ({ elements, appState, tokensManager }) => {
     const { setLoggedIn } = appState;
     const { DIV, CENTER } = elements;
 
     useEffect(() => {
-        AsyncStorage.removeItem('token').then(() => {
-            AsyncStorage.removeItem('refreshToken').then(() => {
-                setLoggedIn(false);
-            });
+        tokensManager.clearTokens().then(() => {
+            setLoggedIn(false);
+        }).catch(err => {
+            alert(JSON.stringify(err))
         });
     }, []);
 

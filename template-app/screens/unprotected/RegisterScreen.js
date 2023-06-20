@@ -13,6 +13,9 @@ function RegisterScreen({ navigation, elements: { VISIBLE, CENTER, SUBMIT, DIV, 
     const loginClickHandler = (res) => {
         if (res.success === true) {
             navigation.navigate('Login');
+        } else {
+            setErrorMessage(res.message);
+            setDisplayErrorMessage(true);
         }
     };
 
@@ -42,7 +45,7 @@ function RegisterScreen({ navigation, elements: { VISIBLE, CENTER, SUBMIT, DIV, 
 
             <DIV style={{ }}>
                 <BR />
-                <SPAN>Already have an account? <A style={{ color: '#1d1d1d', fontWeight: 'bold' }} screen="Login" navigation={navigation}>Log In</A></SPAN>
+                <SPAN>Already have an account? <A style={{ color: '#1d1d1d', fontWeight: 'bold' }} screen="Login">Log In</A></SPAN>
             </DIV>
         </CENTER>
     )

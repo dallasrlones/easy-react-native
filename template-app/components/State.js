@@ -1,20 +1,12 @@
 import { createContext, useEffect, useState } from "react";
 import { Dimensions } from "react-native";
-// async storage
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { tokenExists } from "../utils/tokensManager";
 
 const AppContext = createContext();
 
-function AppContextProvider({ children }) {
+function AppContextProvider({ children, tokenNames, customStateHooks }) {
     const [orientation, setOrientation] = useState("PORTRAIT");
-    const [loggedIn, setLoggedIn] = useState(async () => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            return true;
-        } else {
-            return false;
-        }
-    });
+    const [loggedIn, setLoggedIn] = useState(false);
     const [screenDimensions, setScreenDimensions] = useState({ height: 0, width: 0 });
     const [screenType, setScreenType] = useState("PHONE"); // PHONE, TABLET, DESKTOP
 
@@ -33,13 +25,19 @@ function AppContextProvider({ children }) {
             setScreenType("PHONE");
         }
 
+        tokenExists(tokenNames.token).then(tokenExists => {
+            setLoggedIn(tokenExists);
+        }).catch(err => {
+            alert(JSON.stringify(err))
+        });
     }, [orientation]);
 
     const appState = {
         orientation, setOrientation,
         loggedIn, setLoggedIn,
         screenDimensions,
-        screenType
+        screenType,
+        ...customStateHooks
     };
 
     return (

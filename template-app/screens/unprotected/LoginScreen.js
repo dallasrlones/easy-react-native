@@ -1,9 +1,9 @@
 const { useContext, useState, useEffect } = require('react');
 const { AppContext } = require('../../components/State');
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-function LoginScreen({ navigation, elements, styles,  appState }) {
+function LoginScreen({ elements, styles,  appState, baseUrl, tokensManager }) {
+    const { setTokensInStorage } = tokensManager;
     const { setLoggedIn } = appState;
     const { VISIBLE, CENTER, SUBMIT, DIV, SPAN, BR, H1, A, EMAIL, PASSWORD } = elements;
     const { colors } = styles;
@@ -17,12 +17,13 @@ function LoginScreen({ navigation, elements, styles,  appState }) {
 
     const loginClickHandler = (res) => {
         if (res.success === true) {
-            // handle token
-            AsyncStorage.setItem('token', res.token).then(() => {
-                AsyncStorage.setItem('refreshToken', res.refreshToken).then(() => {
-                    setLoggedIn(true);
-                });
-            });
+            const { token, refreshToken } = res;
+            setTokensInStorage({ token, refreshToken }).then(() => {
+                setLoggedIn(true);
+            }).catch(err => {});
+        } else {
+            setErrorMessage(res.message);
+            setDisplayErrorMessage(true);
         }
     };
 
@@ -49,12 +50,12 @@ function LoginScreen({ navigation, elements, styles,  appState }) {
                 <BR />
                 <PASSWORD changed={setPassword} isValid={true} setValid={() => {}} placeholder={"Password"} />
                 <BR />
-                <SUBMIT style={darkBkg} onPress={loginClickHandler} src="http://localhost:1337/login" onError={loginErrorHandler} payload={payload} >Log In</SUBMIT>
+                <SUBMIT style={darkBkg} onPress={loginClickHandler} src={`${baseUrl}/login`} onError={loginErrorHandler} payload={payload} >Log In</SUBMIT>
             </DIV>
 
             <DIV style={{ }}>
                 <BR />
-                <SPAN>Don't have an account? <A style={{ color: colors.dark, fontWeight: 'bold' }} screen="Register" navigation={navigation}>Register</A></SPAN>
+                <SPAN>Don't have an account? <A style={{ color: colors.dark, fontWeight: 'bold' }} screen="Register">Register</A></SPAN>
             </DIV>
         </CENTER>
     )
