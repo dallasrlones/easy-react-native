@@ -34,9 +34,9 @@ const decodeJwtMiddleware = (req, res, next) => {
                 res.sendStatus(500);
             });
         }).catch((err) => {
-            console.log('error verifying jwt')
-            console.log(err);
-            res.sendStatus(401);
+            // console.log('error verifying jwt')
+            // console.log(err);
+            res.json({ success: false, message: 'EXPIRED' });
         });
     } else {
         console.log('no token')
@@ -110,4 +110,23 @@ const forgotPasswordHandler = (req, res) => {
     }).catch(basicServerError(res, '/forgot-password - emailExists'));
 };
 
-export default { loginHandler, registerHandler, forgotPasswordHandler, decodeJwtMiddleware }
+const refreshMiddleware = (req, res, next) => {
+    let refreshToken = req.headers.authorization.split(' ')[1];
+    getUserIdFromRefreshToken(refreshToken).then(userId => {
+        userService.getUserById(userId).then(user => {
+            if (user != null) {
+                delete user.password;
+                req.user = user;
+                next();
+            } else {
+                res.sendStatus(401);
+            }
+        }).catch(err => {
+            res.sendStatus(500);
+        });
+    }).catch(err => {
+        res.sendStatus(401);
+    });
+};
+
+export default { loginHandler, registerHandler, forgotPasswordHandler, decodeJwtMiddleware, refreshMiddleware }

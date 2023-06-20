@@ -2,7 +2,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import path from 'path';
 import authController from './controllers/authController.js';
-const { loginHandler, registerHandler, forgotPasswordHandler, decodeJwtMiddleware } = authController;
+const { loginHandler, registerHandler, forgotPasswordHandler, decodeJwtMiddleware, refreshMiddleware } = authController;
 import actions from './actions/index.js';
 // run migrations in ./services/migrations.js feel free to change these to meet your eneds
 import './services/migrations.js'
@@ -17,6 +17,10 @@ server.get('/', (_req, res) => res.json({ success: true }));
 server.post('/login', loginHandler);
 server.post('/register', registerHandler);
 server.post('/forgot-password', forgotPasswordHandler);
+
+server.get('/refresh', refreshMiddleware, (req, res) => {
+    res.json({ success: true });
+});
 
 server.post('/payload', decodeJwtMiddleware, (req, res) => {
     const action = actions[req.body.action] || null;

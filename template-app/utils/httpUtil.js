@@ -56,9 +56,26 @@ const setupProtectedHttpUtil = ({ tokenNames, baseUrl, tokensManager }) => {
         });
     };
 
+    const REFRESH = () => {
+        return new Promise((resolve, reject) => {
+            getRefreshToken().then((refreshToken) => {
+                httpUtil.GET(baseUrl + '/refresh', { headers: { Authorization: `Bearer ${refreshToken}` } }).then((res) => {
+                    if (res.success == true) {
+                        setToken(newToken).then(() => {
+                            resolve({ token: res.token, refreshToken: res.refresh });
+                        }).catch(reject);
+                    } else {
+                        tokensManager.clearTokens().then(() => {}).catch(() => {});
+                    }
+                }).catch(() => {
+                    tokensManager.clearTokens().then(() => {}).catch(() => {});
+                });
+            }).catch(reject);
+        });
+    }
+
     const requestHandler = (resolve, reject, type, url, payload) => {
         return (res) => {
-            // alert(JSON.stringify(res))
             if (res.success == false) {
                 if (res.message == 'EXPIRED') {
                     REFRESH().then((res) => {
@@ -120,23 +137,7 @@ const setupProtectedHttpUtil = ({ tokenNames, baseUrl, tokensManager }) => {
     const PAYLOAD = (action, payload = {}) => {
         return new Promise((resolve, reject) => {
             fetchTokenOrLogOut().then((token) => {
-                httpUtil.POST(baseUrl + '/payload', authorizationHeader(token), { action }, payload).then(resolve).catch(reject);
-            }).catch(reject);
-        });
-    }
-
-    const REFRESH = () => {
-        return new Promise((resolve, reject) => {
-            getRefreshToken().then((refreshToken) => {
-                httpUtil.GET(baseUrl + httpUtil.routes.refresh, { headers: { Authorization: `Bearer ${refreshToken}` } }).then((res) => {
-                    if (res.success == true) {
-                        setTokensInStorage({ token: res.token, refreshToken: res.refreshToken }).then(() => {
-                            resolve({ token: res.token, refreshToken: res.refresh });
-                        }).catch(reject);
-                    } else {
-                        reject();
-                    }
-                }).catch(reject);
+                httpUtil.POST(baseUrl + '/payload', authorizationHeader(token), { action }, payload).then(requestHandler(resolve, reject, 'POST', baseUrl + '/payload')).catch(reject);
             }).catch(reject);
         });
     }
