@@ -256,6 +256,10 @@ const createElements = ({ navigation }) => {
         }}>{children}</TouchableOpacity>
     };
 
+    elements.goBack = () => {
+        navigation.goBack();
+    };
+
     elements.UL = ({ children, style, onPress }) => {
         return (
             <View style={[styles.ul, style]}>
