@@ -163,11 +163,11 @@ const createElements = ({ navigation }) => {
         return isVisible ? <View onPress={onPress}>{children}</View> : null
     }
 
-    elements.DIV = ({ children, style }) => {
-        const childrenIsString = typeof children === 'string';
+    elements.DIV = ({ children, style, onPress }) => {
+        const childrenIsString = (typeof children === 'string');
 
         return (
-            <View style={style}>
+            <View style={style} onPress={onPress}>
                 {childrenIsString ? <Text>{children}</Text> : children}
             </View>
         )
@@ -238,22 +238,28 @@ const createElements = ({ navigation }) => {
     };
 
     elements.A = ({ children, style, screen, onPress }) => {
-        // if children is a string then it is the text of the link
-        if (typeof children === 'string') {
-            return <Text style={style} onPress={() => {
-                if (onPress) {
-                    onPress();
-                }
-                navigation.navigate(screen);
-            }}>{children}</Text>
-        }
-
-        return <TouchableOpacity style={[styles.a, style]} onPress={() => { 
-            if (onPress != undefined) {
+        const handlePress = () => {
+            if (onPress) {
                 onPress();
             }
-            navigation.navigate(screen)
-        }}>{children}</TouchableOpacity>
+            navigation.navigate(screen);
+        };
+
+        if (typeof children === 'string') {
+            return (
+                <TouchableOpacity onPress={handlePress} style={{ minHeight: 30 }}>
+                    <Text style={style}>
+                        {children}
+                    </Text>
+                </TouchableOpacity>
+            );
+        }
+
+        return (
+            <TouchableOpacity style={[styles.a, style]} onPress={handlePress}>
+                {children}
+            </TouchableOpacity>
+        );
     };
 
     elements.goBack = () => {
@@ -309,8 +315,8 @@ const createElements = ({ navigation }) => {
         },
     });
 
-    elements.BTN = ({ children, style, onPress, src, findOptions, onError, headers }) => {
-        let newOnPress = undefined;
+    elements.BTN = ({ children, style, onPress, src, findOptions, onError, headers, textSize, color }) => {
+        let newOnPress = onPress;
         if (src && !findOptions) {
             newOnPress = () => {
                 HttpUtil.GET(src, headers || {}).then((res) => {
@@ -328,8 +334,8 @@ const createElements = ({ navigation }) => {
         }
 
         return (
-            <TouchableOpacity style={[btnStyles.btn, style]} onPress={newOnPress || onPress}>
-                <Text style={btnStyles.btnText}>{children}</Text>
+            <TouchableOpacity style={[btnStyles.btn, style]} onPress={newOnPress}>
+                <Text style={{...btnStyles.btnText, fontSize: textSize , color}}>{children}</Text>
             </TouchableOpacity>
         );
     };
@@ -352,9 +358,13 @@ const createElements = ({ navigation }) => {
             };
         }
 
+        if (style !== undefined && style.color) {
+            btnStyles.btnText.color = style.color;
+        }
+
         return (
             <TouchableOpacity style={[btnStyles.btn, style]} onPress={newOnPress || onPress}>
-                <Text style={btnStyles.btnText}>{children}</Text>
+                <Text style={{ ...btnStyles.btnText }}>{children}</Text>
             </TouchableOpacity>
         );
     };
@@ -469,6 +479,7 @@ const createElements = ({ navigation }) => {
         },
     });
 
+    elements.VL = ({ style }) => (<Text style={{ textAlign: 'center', textAlignVertical: 'center', padding: 10, color: (style == undefined || style.color == undefined) ? '#DEDEDE' : style.color }}>|</Text>);
 
     elements.HSPLIT = ({ children, style }) => {
         const validateColWidths = (cols) => {

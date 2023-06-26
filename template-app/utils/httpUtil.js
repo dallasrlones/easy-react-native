@@ -76,8 +76,14 @@ const setupProtectedHttpUtil = ({ tokenNames, baseUrl, tokensManager }) => {
 
     const requestHandler = (resolve, reject, type, url, payload) => {
         return (res) => {
+
+            // alert(JSON.stringify(res))
+
             if (res.success == false) {
                 if (res.message == 'EXPIRED') {
+
+                    alert('shmexpired')
+
                     REFRESH().then((res) => {
                         if (type == 'GET') {
                             httpUtil.protected.GET(url).then(resolve).catch(reject);
@@ -96,7 +102,7 @@ const setupProtectedHttpUtil = ({ tokenNames, baseUrl, tokensManager }) => {
                         }
                     }).catch(reject);
                 } else {
-                    reject();
+                    reject(res.message);
                 }
             } else { resolve(res); }
         };
